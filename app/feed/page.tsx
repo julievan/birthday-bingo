@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { type Submission } from "@/lib/bingoUtils";
+import { getShuffledCriteria } from "@/lib/bingoCriteria";
 import Link from "next/link";
 
 const ginghamStyle = {
@@ -30,6 +31,13 @@ export default function LiveFeed() {
   const [winner, setWinner] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastFetch, setLastFetch] = useState(Date.now());
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const [criteria, setCriteria] = useState<string[]>([]);
+
+  useEffect(() => {
+    const shuffled = getShuffledCriteria();
+    setCriteria(shuffled);
+  }, []);
 
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -61,6 +69,73 @@ export default function LiveFeed() {
     return () => clearInterval(interval);
   }, [lastFetch, winner]);
 
+  if (selectedSubmission && criteria.length > 0) {
+    return (
+      <div className="min-h-screen p-3 md:p-6" style={ginghamStyle}>
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white/95 rounded-2xl shadow-lg p-4 md:p-6 border-2" style={{ borderColor: "#e8d5c4" }}>
+            <button
+              onClick={() => setSelectedSubmission(null)}
+              className="mb-4 font-semibold text-sm hover:underline"
+              style={{ color: "#c97a8a" }}
+            >
+              ← Back to Feed
+            </button>
+
+            <h1 className="text-3xl md:text-4xl font-bold text-center mb-2" style={{ color: "#c97a8a" }}>
+              {selectedSubmission.playerName}'s Card
+            </h1>
+            <p className="text-center mb-6 text-sm" style={{ color: "#7a8a8a" }}>
+              Submitted at {new Date(selectedSubmission.timestamp).toLocaleTimeString()}
+            </p>
+
+            {/* Bingo Grid */}
+            <div className="grid grid-cols-5 gap-1 md:gap-2 mb-6">
+              {criteria.map((criterion, index) => (
+                <div key={index} className="flex flex-col gap-1">
+                  {/* Criteria Box */}
+                  <div
+                    className="rounded-lg p-2 md:p-3 text-center text-xs md:text-sm font-medium h-28 md:h-32 flex flex-col items-center justify-center border-2 overflow-hidden"
+                    style={{
+                      backgroundColor: selectedSubmission.marked[index] ? "#f0d5c4" : "#faf8f3",
+                      borderColor: selectedSubmission.marked[index] ? "#d9b8a8" : "#e8d5c4",
+                      color: "#5a7a7a",
+                    }}
+                  >
+                    <span className="leading-tight text-center">
+                      {criterion}
+                    </span>
+                  </div>
+
+                  {/* Name */}
+                  <div
+                    className="px-2 py-1 rounded text-xs md:text-sm border-2 bg-white text-center"
+                    style={{
+                      borderColor: "#d5c4b8",
+                      color: "#5a7a7a",
+                    }}
+                  >
+                    {selectedSubmission.names[index] || "—"}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <button
+                onClick={() => setSelectedSubmission(null)}
+                className="font-semibold text-sm md:text-base hover:underline"
+                style={{ color: "#c97a8a" }}
+              >
+                Back to Feed
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen p-3 md:p-6" style={ginghamStyle}>
       <div className="max-w-2xl mx-auto">
@@ -77,7 +152,7 @@ export default function LiveFeed() {
             Live Feed 📊
           </h1>
           <p className="text-center mb-6 text-sm md:text-base" style={{ color: "#7a8a8a" }}>
-            Watch in real-time as people submit their bingo cards!
+            Watch in real-time as people submit their bingo cards! Click to verify.
           </p>
 
           {winner && (
@@ -110,9 +185,10 @@ export default function LiveFeed() {
           ) : (
             <div className="space-y-2 md:space-y-3">
               {submissions.map((submission, index) => (
-                <div
+                <button
                   key={submission.id}
-                  className="p-3 md:p-4 rounded-lg border-2 transition-all"
+                  onClick={() => setSelectedSubmission(submission)}
+                  className="w-full text-left p-3 md:p-4 rounded-lg border-2 transition-all hover:shadow-md"
                   style={{
                     backgroundColor: submission.hasBingo ? "#f0d5c4" : "#f9f7f3",
                     borderColor: submission.hasBingo ? "#d9b8a8" : "#e8d5c4",
@@ -132,11 +208,14 @@ export default function LiveFeed() {
                         </p>
                       </div>
                     </div>
-                    {submission.hasBingo && (
-                      <div className="text-xl md:text-2xl flex-shrink-0">🎉</div>
-                    )}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {submission.hasBingo && (
+                        <div className="text-xl md:text-2xl">🎉</div>
+                      )}
+                      <span style={{ color: "#c97a8a" }}>→</span>
+                    </div>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}

@@ -51,12 +51,30 @@ export default function BingoCard() {
     setNames(newNames);
     setError("");
 
-    // Check if this name matches the player's own name
+    // Check own name and duplicates
     const newErrors = { ...fieldErrors };
+    
+    // Check if this name matches player's own name
     if (value.trim().toLowerCase() === playerName.trim().toLowerCase()) {
       newErrors[index] = "You can't use your own name!";
     } else {
-      delete newErrors[index];
+      // Check for duplicates with other boxes
+      const lowerValue = value.trim().toLowerCase();
+      let hasDuplicate = false;
+      if (lowerValue) {
+        for (let i = 0; i < newNames.length; i++) {
+          if (i !== index && newNames[i].trim().toLowerCase() === lowerValue) {
+            hasDuplicate = true;
+            break;
+          }
+        }
+      }
+      
+      if (hasDuplicate) {
+        newErrors[index] = "This name appears in another box!";
+      } else {
+        delete newErrors[index];
+      }
     }
     setFieldErrors(newErrors);
 
@@ -86,15 +104,16 @@ export default function BingoCard() {
       return;
     }
 
-    // Check for field errors
+    // Check for any field errors
     if (Object.keys(fieldErrors).length > 0) {
-      setError("Please fix the errors below before submitting.");
+      setError("Please fix the errors in the boxes below before submitting.");
       return;
     }
 
-    const validationError = validateNames(names);
-    if (validationError) {
-      setError(validationError);
+    // Run final validation
+    const validationErrors = validateNames(names);
+    if (Object.keys(validationErrors).length > 0) {
+      setError("Please fix the duplicate names before submitting.");
       return;
     }
 
@@ -241,7 +260,7 @@ export default function BingoCard() {
             </div>
 
             {/* Bingo Status */}
-            {hasBingo && (
+            {hasBingo && Object.keys(fieldErrors).length === 0 && (
               <div className="rounded-lg p-4 text-center border-2" style={{ backgroundColor: "#f0e6d3", borderColor: "#d9b8a8" }}>
                 <p className="font-bold text-lg" style={{ color: "#c97a8a" }}>🎉 BINGO! 🎉</p>
               </div>
@@ -259,16 +278,21 @@ export default function BingoCard() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={submitting || submitted}
-              className="w-full text-white py-3 md:py-4 rounded-lg font-bold text-base md:text-lg transition disabled:cursor-not-allowed"
+              disabled={submitting || submitted || Object.keys(fieldErrors).length > 0}
+              className="w-full text-white py-3 md:py-4 rounded-lg font-bold text-base md:text-lg transition"
               style={{
-                backgroundColor: submitting || submitted ? "#a8a8a8" : "#c97a8a",
+                backgroundColor: submitting || submitted || Object.keys(fieldErrors).length > 0 ? "#a8a8a8" : "#c97a8a",
+                cursor: submitting || submitted || Object.keys(fieldErrors).length > 0 ? "not-allowed" : "pointer",
               }}
               onMouseEnter={(e) => {
-                if (!submitting && !submitted) e.currentTarget.style.backgroundColor = "#b56a7a";
+                if (!submitting && !submitted && Object.keys(fieldErrors).length === 0) {
+                  e.currentTarget.style.backgroundColor = "#b56a7a";
+                }
               }}
               onMouseLeave={(e) => {
-                if (!submitting && !submitted) e.currentTarget.style.backgroundColor = "#c97a8a";
+                if (!submitting && !submitted && Object.keys(fieldErrors).length === 0) {
+                  e.currentTarget.style.backgroundColor = "#c97a8a";
+                }
               }}
             >
               {submitting ? "Submitting..." : "Submit Bingo"}
