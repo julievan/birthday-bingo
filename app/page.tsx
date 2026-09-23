@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getShuffledCriteria } from "@/lib/bingoCriteria";
-import { checkBingo, validateNames } from "@/lib/bingoUtils";
+import { checkBingo } from "@/lib/bingoUtils";
 import Link from "next/link";
 
 const ginghamStyle = {
@@ -45,56 +45,44 @@ export default function BingoCard() {
     setMarked(Array(25).fill(false));
   }, []);
 
+  const validateAllNames = (nameList: string[]): boolean => {
+    const seen = new Map<string, number>();
+    for (let i = 0; i < nameList.length; i++) {
+      const name = nameList[i].trim().toLowerCase();
+      if (name) {
+        if (seen.has(name)) {
+          return false;
+        }
+        seen.set(name, i);
+      }
+    }
+    return true;
+  };
+
   const handleNameChange = (index: number, value: string) => {
     const newNames = [...names];
     newNames[index] = value;
     setNames(newNames);
     setError("");
 
-    // Check own name and duplicates
     const newErrors: Record<number, string> = {};
     
-    // Check if this name matches player's own name
     if (value.trim().toLowerCase() === playerName.trim().toLowerCase()) {
       newErrors[index] = "You can't use your own name!";
     } else {
-      // Check for duplicates with other boxes
       const lowerValue = value.trim().toLowerCase();
-      let hasDuplicate = false;
       if (lowerValue) {
         for (let i = 0; i < newNames.length; i++) {
           if (i !== index && newNames[i].trim().toLowerCase() === lowerValue) {
-            hasDuplicate = true;
+            newErrors[index] = "This name appears in another box!";
             break;
           }
         }
       }
-      
-      if (hasDuplicate) {
-        newErrors[index] = "This name appears in another box!";
-      }
     }
-    
-    // Copy over errors from other fields that weren't just edited
-    Object.entries(fieldErrors).forEach(([key, val]) => {
-      const keyNum = parseInt(key);
-      if (keyNum !== index && !newErrors[keyNum]) {
-        // Revalidate the other field
-        const otherName = newNames[keyNum];
-        if (otherName.trim().toLowerCase() === playerName.trim().toLowerCase()) {
-          newErrors[keyNum] = "You can't use your own name!";
-        } else {
-          const otherLower = otherName.trim().toLowerCase();
-          if (otherLower && newNames.some((n, i) => i !== keyNum && n.trim().toLowerCase() === otherLower)) {
-            newErrors[keyNum] = "This name appears in another box!";
-          }
-        }
-      }
-    });
     
     setFieldErrors(newErrors);
 
-    // Auto-mark box if name is entered, unmark if name is cleared
     const newMarked = [...marked];
     if (value.trim()) {
       newMarked[index] = true;
@@ -122,16 +110,13 @@ export default function BingoCard() {
       return;
     }
 
-    // Check for any field errors
     if (hasFieldErrors) {
       setError("Please fix the errors in the boxes below before submitting.");
       return;
     }
 
-    // Run final validation
-    const validationErrors = validateNames(names);
-    if (Object.keys(validationErrors).length > 0) {
-      setError("Please fix the duplicate names before submitting.");
+    if (!validateAllNames(names)) {
+      setError("You have duplicate names. Please fix them.");
       return;
     }
 
@@ -223,8 +208,6 @@ export default function BingoCard() {
                 placeholder="Enter your name"
                 className="w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 text-base bg-white"
                 style={{ borderColor: "#d5c4b8", color: "#5a7a7a" }}
-                onFocus={(e) => e.target.style.borderColor = "#c97a8a"}
-                onBlur={(e) => e.target.style.borderColor = "#d5c4b8"}
                 disabled={submitted}
               />
             </div>
@@ -261,12 +244,6 @@ export default function BingoCard() {
                         borderColor: fieldErrors[index] ? "#d9534f" : "#d5c4b8",
                         color: "#5a7a7a",
                       }}
-                      onFocus={(e) => {
-                        if (!fieldErrors[index]) e.target.style.borderColor = "#c97a8a";
-                      }}
-                      onBlur={(e) => {
-                        if (!fieldErrors[index]) e.target.style.borderColor = "#d5c4b8";
-                      }}
                       disabled={submitted}
                     />
                     {fieldErrors[index] && (
@@ -301,16 +278,6 @@ export default function BingoCard() {
               style={{
                 backgroundColor: submitting || submitted || hasFieldErrors ? "#a8a8a8" : "#c97a8a",
                 cursor: submitting || submitted || hasFieldErrors ? "not-allowed" : "pointer",
-              }}
-              onMouseEnter={(e) => {
-                if (!submitting && !submitted && !hasFieldErrors) {
-                  e.currentTarget.style.backgroundColor = "#b56a7a";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!submitting && !submitted && !hasFieldErrors) {
-                  e.currentTarget.style.backgroundColor = "#c97a8a";
-                }
               }}
             >
               {submitting ? "Submitting..." : "Submit Bingo"}
