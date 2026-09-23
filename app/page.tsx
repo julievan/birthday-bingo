@@ -14,6 +14,7 @@ export default function BingoCard() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<number, string>>({});
   const [cardId] = useState(() => Math.random().toString(36).substring(7));
 
   useEffect(() => {
@@ -28,6 +29,15 @@ export default function BingoCard() {
     newNames[index] = value;
     setNames(newNames);
     setError("");
+
+    // Check if this name matches the player's own name
+    const newErrors = { ...fieldErrors };
+    if (value.trim().toLowerCase() === playerName.trim().toLowerCase()) {
+      newErrors[index] = "You can't use your own name!";
+    } else {
+      delete newErrors[index];
+    }
+    setFieldErrors(newErrors);
 
     // Auto-mark box if name is entered, unmark if name is cleared
     const newMarked = [...marked];
@@ -52,6 +62,12 @@ export default function BingoCard() {
 
     if (!playerName.trim()) {
       setError("Please enter your name at the top.");
+      return;
+    }
+
+    // Check for field errors
+    if (Object.keys(fieldErrors).length > 0) {
+      setError("Please fix the errors below before submitting.");
       return;
     }
 
@@ -96,17 +112,18 @@ export default function BingoCard() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-100 via-yellow-50 to-emerald-100 flex items-center justify-center p-4">
-        <div className="bg-white/80 rounded-2xl shadow-lg p-6 max-w-md w-full text-center border border-rose-200">
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundImage: "linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3)", backgroundSize: "60px 60px", backgroundPosition: "0 0, 30px 30px", backgroundColor: "#faf8f3" }}>
+        <div className="bg-white/90 rounded-2xl shadow-xl p-6 max-w-md w-full text-center border-2" style={{ borderColor: "#e8d5c4" }}>
           <div className="text-5xl mb-4">🎉</div>
-          <h1 className="text-3xl font-bold text-stone-700 mb-4">
+          <h1 className="text-3xl font-bold mb-4" style={{ color: "#c97a8a" }}>
             Bingo Submitted!
           </h1>
-          <p className="text-stone-600 mb-6">
+          <p className="mb-6" style={{ color: "#7a8a8a" }}>
             {playerName}, your bingo card has been submitted. Check the{" "}
             <Link
               href="/feed"
-              className="text-rose-600 hover:underline font-bold"
+              className="font-bold hover:underline"
+              style={{ color: "#c97a8a" }}
             >
               live feed
             </Link>{" "}
@@ -114,7 +131,8 @@ export default function BingoCard() {
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-rose-300 text-white px-6 py-2 rounded-lg hover:bg-rose-400 transition"
+            className="px-6 py-2 rounded-lg transition text-white font-semibold"
+            style={{ backgroundColor: "#c97a8a" }}
           >
             Play Again
           </button>
@@ -124,20 +142,20 @@ export default function BingoCard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-yellow-50 to-emerald-50 p-3 md:p-6">
+    <div className="min-h-screen p-3 md:p-6" style={{ backgroundImage: "linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #e8d5c4 25%, transparent 25%, transparent 75%, #e8d5c4 75%, #e8d5c4), linear-gradient(45deg, #e8d5c4 25%, transparent 25%, transparent 75%, #e8d5c4 75%, #e8d5c4)", backgroundSize: "60px 60px, 60px 60px, 120px 120px, 120px 120px", backgroundPosition: "0 0, 30px 30px, 0 0, 30px 30px", backgroundColor: "#faf8f3" }}>
       <div className="max-w-5xl mx-auto">
-        <div className="bg-white/85 rounded-2xl shadow-lg p-4 md:p-6 border border-rose-200 backdrop-blur-sm">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 text-rose-600">
+        <div className="bg-white/95 rounded-2xl shadow-lg p-4 md:p-6 border-2" style={{ borderColor: "#e8d5c4" }}>
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-2" style={{ color: "#c97a8a" }}>
             Birthday Bingo 🎂
           </h1>
-          <p className="text-center text-stone-600 mb-6 text-sm md:text-base">
+          <p className="text-center mb-6 text-sm md:text-base" style={{ color: "#7a8a8a" }}>
             Find people who match the criteria and get 5 in a row to win!
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Player Name Input */}
             <div>
-              <label className="block text-sm font-semibold text-stone-700 mb-2">
+              <label className="block text-sm font-semibold mb-2" style={{ color: "#5a7a7a" }}>
                 Your Name
               </label>
               <input
@@ -145,7 +163,10 @@ export default function BingoCard() {
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 placeholder="Enter your name"
-                className="w-full px-4 py-2 border border-rose-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent text-base bg-white"
+                className="w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 text-base bg-white"
+                style={{ borderColor: "#d5c4b8", color: "#5a7a7a" }}
+                onFocus={(e) => e.target.style.borderColor = "#c97a8a"}
+                onBlur={(e) => e.target.style.borderColor = "#d5c4b8"}
                 disabled={submitted}
               />
             </div>
@@ -158,41 +179,57 @@ export default function BingoCard() {
                   <button
                     type="button"
                     onClick={() => handleToggle(index)}
-                    className={`rounded-lg p-2 md:p-3 text-center transition-all text-xs md:text-sm font-medium h-24 md:h-28 flex flex-col items-center justify-center cursor-pointer border-2 ${
-                      marked[index]
-                        ? "bg-gradient-to-br from-amber-100 to-rose-100 text-stone-800 border-rose-300 shadow-md scale-105"
-                        : "bg-white text-stone-700 border-rose-200 hover:border-rose-300 hover:shadow-sm hover:bg-rose-50"
-                    }`}
+                    className={`rounded-lg p-2 md:p-3 text-center transition-all text-xs md:text-sm font-medium h-28 md:h-32 flex flex-col items-center justify-center cursor-pointer border-2 overflow-hidden`}
+                    style={{
+                      backgroundColor: marked[index] ? "#f0d5c4" : "#faf8f3",
+                      borderColor: marked[index] ? "#d9b8a8" : "#e8d5c4",
+                      color: "#5a7a7a",
+                    }}
                   >
-                    <span className="line-clamp-5 leading-tight">
+                    <span className="leading-tight text-center">
                       {criterion}
                     </span>
                   </button>
 
                   {/* Name Input Below Box */}
-                  <input
-                    type="text"
-                    value={names[index]}
-                    onChange={(e) => handleNameChange(index, e.target.value)}
-                    placeholder="Name"
-                    className="w-full px-2 py-1 border border-rose-200 rounded text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent bg-white text-stone-700 placeholder-stone-400"
-                    disabled={submitted}
-                  />
+                  <div>
+                    <input
+                      type="text"
+                      value={names[index]}
+                      onChange={(e) => handleNameChange(index, e.target.value)}
+                      placeholder="Name"
+                      className="w-full px-2 py-1 border-2 rounded text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-offset-0 bg-white"
+                      style={{
+                        borderColor: fieldErrors[index] ? "#d9534f" : "#d5c4b8",
+                        color: "#5a7a7a",
+                      }}
+                      onFocus={(e) => {
+                        if (!fieldErrors[index]) e.target.style.borderColor = "#c97a8a";
+                      }}
+                      onBlur={(e) => {
+                        if (!fieldErrors[index]) e.target.style.borderColor = "#d5c4b8";
+                      }}
+                      disabled={submitted}
+                    />
+                    {fieldErrors[index] && (
+                      <p className="text-xs mt-1 text-red-600">{fieldErrors[index]}</p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
 
             {/* Bingo Status */}
             {hasBingo && (
-              <div className="bg-gradient-to-r from-amber-100 to-rose-100 border-2 border-rose-300 rounded-lg p-4 text-center shadow-sm">
-                <p className="text-rose-900 font-bold text-lg">🎉 BINGO! 🎉</p>
+              <div className="rounded-lg p-4 text-center border-2" style={{ backgroundColor: "#f0e6d3", borderColor: "#d9b8a8" }}>
+                <p className="font-bold text-lg" style={{ color: "#c97a8a" }}>🎉 BINGO! 🎉</p>
               </div>
             )}
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-100 border-2 border-red-300 rounded-lg p-4">
-                <p className="text-red-700 font-semibold text-sm md:text-base">
+              <div className="border-2 rounded-lg p-4" style={{ backgroundColor: "#ffe6e6", borderColor: "#d9534f" }}>
+                <p className="font-semibold text-sm md:text-base" style={{ color: "#c13832" }}>
                   {error}
                 </p>
               </div>
@@ -202,7 +239,16 @@ export default function BingoCard() {
             <button
               type="submit"
               disabled={submitting || submitted}
-              className="w-full bg-gradient-to-r from-rose-300 to-amber-200 text-white py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:from-rose-400 hover:to-amber-300 transition disabled:from-stone-300 disabled:to-stone-300 disabled:cursor-not-allowed shadow-md"
+              className="w-full text-white py-3 md:py-4 rounded-lg font-bold text-base md:text-lg transition disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: submitting || submitted ? "#a8a8a8" : "#c97a8a",
+              }}
+              onMouseEnter={(e) => {
+                if (!submitting && !submitted) e.currentTarget.style.backgroundColor = "#b56a7a";
+              }}
+              onMouseLeave={(e) => {
+                if (!submitting && !submitted) e.currentTarget.style.backgroundColor = "#c97a8a";
+              }}
             >
               {submitting ? "Submitting..." : "Submit Bingo"}
             </button>
@@ -211,7 +257,8 @@ export default function BingoCard() {
             <div className="text-center">
               <Link
                 href="/feed"
-                className="text-rose-600 hover:text-rose-700 font-semibold text-sm md:text-base"
+                className="font-semibold text-sm md:text-base hover:underline"
+                style={{ color: "#c97a8a" }}
               >
                 View Live Feed →
               </Link>

@@ -41,33 +41,34 @@ export default function LiveFeed() {
   }, [lastFetch, winner]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-emerald-50 to-rose-50 p-3 md:p-6">
+    <div className="min-h-screen p-3 md:p-6" style={{ backgroundImage: "linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #e8d5c4 25%, transparent 25%, transparent 75%, #e8d5c4 75%, #e8d5c4), linear-gradient(45deg, #e8d5c4 25%, transparent 25%, transparent 75%, #e8d5c4 75%, #e8d5c4)", backgroundSize: "60px 60px, 60px 60px, 120px 120px, 120px 120px", backgroundPosition: "0 0, 30px 30px, 0 0, 30px 30px", backgroundColor: "#faf8f3" }}>
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white/85 rounded-2xl shadow-lg p-4 md:p-6 border border-rose-200 backdrop-blur-sm">
+        <div className="bg-white/95 rounded-2xl shadow-lg p-4 md:p-6 border-2" style={{ borderColor: "#e8d5c4" }}>
           <Link
             href="/"
-            className="text-rose-600 hover:text-rose-700 font-semibold text-sm mb-4 inline-block"
+            className="font-semibold text-sm mb-4 inline-block hover:underline"
+            style={{ color: "#c97a8a" }}
           >
             ← Back to Bingo Card
           </Link>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-2 text-rose-600">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-2" style={{ color: "#c97a8a" }}>
             Live Feed 📊
           </h1>
-          <p className="text-center text-stone-600 mb-6 text-sm md:text-base">
+          <p className="text-center mb-6 text-sm md:text-base" style={{ color: "#7a8a8a" }}>
             Watch in real-time as people submit their bingo cards!
           </p>
 
           {winner && (
-            <div className="bg-gradient-to-r from-amber-100 via-rose-100 to-pink-100 border-2 border-rose-300 rounded-lg p-4 md:p-6 mb-6 text-center shadow-md">
+            <div className="rounded-lg p-4 md:p-6 mb-6 text-center border-2" style={{ backgroundColor: "#f0e6d3", borderColor: "#d9b8a8" }}>
               <div className="text-4xl md:text-5xl mb-2">👑</div>
-              <h2 className="text-xl md:text-2xl font-bold text-stone-800">
+              <h2 className="text-xl md:text-2xl font-bold" style={{ color: "#5a7a7a" }}>
                 {winner.playerName}
               </h2>
-              <p className="text-stone-700 font-semibold text-sm md:text-base">
+              <p className="font-semibold text-sm md:text-base" style={{ color: "#7a8a8a" }}>
                 Got BINGO first! 🎉
               </p>
-              <p className="text-xs md:text-sm text-stone-600 mt-2">
+              <p className="text-xs md:text-sm mt-2" style={{ color: "#7a8a8a" }}>
                 {new Date(winner.timestamp).toLocaleTimeString()}
               </p>
             </div>
@@ -75,13 +76,13 @@ export default function LiveFeed() {
 
           {loading ? (
             <div className="text-center py-8">
-              <p className="text-stone-600 animate-pulse text-sm md:text-base">
+              <p className="text-sm md:text-base animate-pulse" style={{ color: "#7a8a8a" }}>
                 Loading submissions...
               </p>
             </div>
           ) : submissions.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-stone-600 text-base md:text-lg">
+              <p className="text-base md:text-lg" style={{ color: "#7a8a8a" }}>
                 No submissions yet. Go play bingo! 🎮
               </p>
             </div>
@@ -90,22 +91,22 @@ export default function LiveFeed() {
               {submissions.map((submission, index) => (
                 <div
                   key={submission.id}
-                  className={`p-3 md:p-4 rounded-lg border-2 transition-all ${
-                    submission.hasBingo
-                      ? "bg-gradient-to-r from-amber-100 to-rose-100 border-rose-300"
-                      : "bg-sky-50 border-rose-200"
-                  }`}
+                  className="p-3 md:p-4 rounded-lg border-2 transition-all"
+                  style={{
+                    backgroundColor: submission.hasBingo ? "#f0d5c4" : "#f9f7f3",
+                    borderColor: submission.hasBingo ? "#d9b8a8" : "#e8d5c4",
+                  }}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                      <div className="text-xl md:text-2xl font-bold text-rose-300 flex-shrink-0 w-6 md:w-8">
+                      <div className="text-xl md:text-2xl font-bold flex-shrink-0 w-6 md:w-8" style={{ color: "#c97a8a" }}>
                         #{index + 1}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-base md:text-lg text-stone-800 truncate">
+                        <p className="font-bold text-base md:text-lg truncate" style={{ color: "#5a7a7a" }}>
                           {submission.playerName}
                         </p>
-                        <p className="text-xs md:text-sm text-stone-600">
+                        <p className="text-xs md:text-sm" style={{ color: "#7a8a8a" }}>
                           {new Date(submission.timestamp).toLocaleTimeString()}
                         </p>
                       </div>
@@ -119,7 +120,7 @@ export default function LiveFeed() {
             </div>
           )}
 
-          <div className="mt-6 md:mt-8 text-center text-xs md:text-sm text-stone-600">
+          <div className="mt-6 md:mt-8 text-center text-xs md:text-sm" style={{ color: "#7a8a8a" }}>
             Page auto-refreshes every 2 seconds
           </div>
         </div>
