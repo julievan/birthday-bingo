@@ -5,6 +5,27 @@ import { getShuffledCriteria } from "@/lib/bingoCriteria";
 import { checkBingo, validateNames } from "@/lib/bingoUtils";
 import Link from "next/link";
 
+const ginghamStyle = {
+  backgroundImage: `
+    linear-gradient(90deg, 
+      #f5e6d3 0%, #f5e6d3 20%, 
+      #d4e4f7 20%, #d4e4f7 40%, 
+      #f5e6d3 40%, #f5e6d3 60%, 
+      #e8d5c4 60%, #e8d5c4 80%, 
+      #f5e6d3 80%, #f5e6d3 100%
+    ),
+    linear-gradient(0deg, 
+      #f5e6d3 0%, #f5e6d3 20%, 
+      #e8d5c4 20%, #e8d5c4 40%, 
+      #f5e6d3 40%, #f5e6d3 60%, 
+      #d4e4f7 60%, #d4e4f7 80%, 
+      #f5e6d3 80%, #f5e6d3 100%
+    )
+  `,
+  backgroundSize: "100px 100px",
+  backgroundColor: "#faf8f3",
+};
+
 export default function BingoCard() {
   const [playerName, setPlayerName] = useState("");
   const [names, setNames] = useState<string[]>([]);
@@ -112,7 +133,7 @@ export default function BingoCard() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundImage: "linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3)", backgroundSize: "60px 60px", backgroundPosition: "0 0, 30px 30px", backgroundColor: "#faf8f3" }}>
+      <div className="min-h-screen flex items-center justify-center p-4" style={ginghamStyle}>
         <div className="bg-white/90 rounded-2xl shadow-xl p-6 max-w-md w-full text-center border-2" style={{ borderColor: "#e8d5c4" }}>
           <div className="text-5xl mb-4">🎉</div>
           <h1 className="text-3xl font-bold mb-4" style={{ color: "#c97a8a" }}>
@@ -142,7 +163,7 @@ export default function BingoCard() {
   }
 
   return (
-    <div className="min-h-screen p-3 md:p-6" style={{ backgroundImage: "linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #f5e6d3 25%, transparent 25%, transparent 75%, #f5e6d3 75%, #f5e6d3), linear-gradient(45deg, #e8d5c4 25%, transparent 25%, transparent 75%, #e8d5c4 75%, #e8d5c4), linear-gradient(45deg, #e8d5c4 25%, transparent 25%, transparent 75%, #e8d5c4 75%, #e8d5c4)", backgroundSize: "60px 60px, 60px 60px, 120px 120px, 120px 120px", backgroundPosition: "0 0, 30px 30px, 0 0, 30px 30px", backgroundColor: "#faf8f3" }}>
+    <div className="min-h-screen p-3 md:p-6" style={ginghamStyle}>
       <div className="max-w-5xl mx-auto">
         <div className="bg-white/95 rounded-2xl shadow-lg p-4 md:p-6 border-2" style={{ borderColor: "#e8d5c4" }}>
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-2" style={{ color: "#c97a8a" }}>
